@@ -8,10 +8,9 @@ class RoomManager {
     }
     createRoom(user1, user2) {
         const roomId = this.generate().toString();
-        this.rooms.set(roomId.toString(), {
-            user1,
-            user2,
-        });
+        this.rooms.set(roomId, { user1, user2 });
+        user1.socket.join(roomId);
+        user2.socket.join(roomId);
         user1.socket.emit("send-offer", {
             roomId
         });

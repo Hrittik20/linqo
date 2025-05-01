@@ -1,13 +1,6 @@
-'use client'
-
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
-import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Send, X, Wallet, Users } from 'lucide-react';
-
 
 const URL = "http://localhost:3000";
 
@@ -198,78 +191,18 @@ export const TEST = ({
     }, [name])
 
     useEffect(() => {
-        if (localVideoRef.current && localVideoTrack) {
-          localVideoRef.current.srcObject = new MediaStream([localVideoTrack]);
-          localVideoRef.current.play().catch((error) => {
-            console.error("Error playing local video:", error);
-          });
+        if (localVideoRef.current) {
+            if (localVideoTrack) {
+                localVideoRef.current.srcObject = new MediaStream([localVideoTrack]);
+                localVideoRef.current.play();
+            }
         }
-      }, [localVideoTrack]);
+    }, [localVideoRef])
 
-    return (
-        // <div>
-        //     Hi {name}
-        //     <video autoPlay width={400} height={400} ref={localVideoRef} />
-        //     {lobby ? "Waiting to connect you to someone" : null}
-        //     <video autoPlay width={400} height={400} ref={remoteVideoRef} />
-        // </div>
-        
-        <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
-            <Head>
-            <title>Random Connect | Linqo</title>
-            <meta name="description" content="Connect with random strangers on Linqo" />
-            <link rel="icon" href="/favicon.ico" />
-            </Head>
-
-            {/* Header */}
-            <header className="border-b border-gray-800 backdrop-blur-md bg-gray-900/80 fixed w-full z-10">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex justify-between items-center h-16">
-                <Link href="/" className="flex items-center space-x-2 text-gray-300 hover:text-white transition">
-                    <ArrowLeft size={18} />
-                    <span>Back to Home</span>
-                </Link>
-                <div className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 text-transparent bg-clip-text">
-                    Linqo
-                </div>
-                <div className="px-4 py-2 bg-gray-800 rounded-full">
-                    <span className="text-sm font-medium text-gray-200">0x1a2...3b4c</span>
-                </div>
-                </div>
-            </div>
-            </header>
-
-            <main className="pt-16 h-[calc(100vh-4rem)] flex flex-col">
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-                {/* Local Video */}
-                <div className="relative rounded-xl overflow-hidden bg-gray-800 border border-gray-700 shadow-lg">
-                    <div className="absolute inset-0">
-                    <video
-                        autoPlay
-                        ref={localVideoRef}
-                        className="w-full h-full object-cover transform scale-x-[-1]"
-                    ></video>
-                    </div>
-                    <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-70 text-white px-3 py-1 rounded-lg text-sm">
-                    You
-                    </div>
-                </div>
-
-                {/* Remote Video */}
-                <div className="relative rounded-xl overflow-hidden bg-gray-800 border border-gray-700 shadow-lg">
-                    <div className="absolute inset-0">
-                    <video
-                        autoPlay
-                        ref={remoteVideoRef}
-                        className="w-full h-full object-cover transform scale-x-[-1]"
-                    ></video>
-                    </div>
-                    <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-70 text-white px-3 py-1 rounded-lg text-sm">
-                    Stranger
-                    </div>
-                </div>
-            </div>
-            </main>
-        </div>
-    )
+    return <div>
+        Hi {name}
+        <video autoPlay width={400} height={400} ref={localVideoRef} />
+        {lobby ? "Waiting to connect you to someone" : null}
+        <video autoPlay width={400} height={400} ref={remoteVideoRef} />
+    </div>
 }

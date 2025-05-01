@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ArrowRight, Users, Shuffle, Wallet, Send } from 'lucide-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 export default function Home() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -30,7 +31,7 @@ export default function Home() {
                 Linqo
               </span>
             </div>
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               {!walletConnected ? (
                 <button 
                   onClick={connectWallet}
@@ -46,6 +47,9 @@ export default function Home() {
                   </div>
                 </div>
               )}
+            </div> */}
+            <div className="px-4 py-2 flex items-center">
+              <WalletMultiButton className="wallet-adapter-button-small" />
             </div>
           </div>
         </div>
