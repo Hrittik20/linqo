@@ -540,26 +540,42 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { SolanaIntegration } from "./SolanaIntegration";
 
+// Define interface for the transaction info
+interface TransactionInfo {
+  status: 'success' | 'error';
+  amount?: string | number;
+  signature?: string;
+  error?: string;
+}
+
 const URL = "http://localhost:3000";
+
+interface ConnectProps {
+  name: string;
+  localAudioTrack: MediaStreamTrack | null;
+  localVideoTrack: MediaStreamTrack | null;
+  onVideoTrackChange?: (track: MediaStreamTrack | null) => void;
+}
 
 export const Connect = ({
   name,
   localAudioTrack,
   localVideoTrack,
-}) => {
+  onVideoTrackChange,
+}: ConnectProps) => {
     const [searchParams] = useSearchParams();
     const [lobby, setLobby] = useState(true);
-    const [socket, setSocket] = useState(null);
-    const [sendingPc, setSendingPc] = useState(null);
-    const [receivingPc, setReceivingPc] = useState(null);
-    const [remoteVideoTrack, setRemoteVideoTrack] = useState(null);
-    const [remoteAudioTrack, setRemoteAudioTrack] = useState(null);
-    const [remoteMediaStream, setRemoteMediaStream] = useState(null);
-    const remoteVideoRef = useRef();
-    const localVideoRef = useRef();
+    const [socket, setSocket] = useState<Socket | null>(null);
+    const [sendingPc, setSendingPc] = useState<RTCPeerConnection | null>(null);
+    const [receivingPc, setReceivingPc] = useState<RTCPeerConnection | null>(null);
+    const [remoteVideoTrack, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null);
+    const [remoteAudioTrack, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null);
+    const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
+    const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+    const localVideoRef = useRef<HTMLVideoElement | null>(null);
 
     const { publicKey } = useWallet();
-    const [peerWalletAddress, setPeerWalletAddress] = useState(null);
+    const [peerWalletAddress, setPeerWalletAddress] = useState<string | null>(null);
 
     const [isConnected, setIsConnected] = useState(true);
     const [videoEnabled, setVideoEnabled] = useState(true);
@@ -567,8 +583,8 @@ export const Connect = ({
     const [isTransactionOpen, setIsTransactionOpen] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
 
-    const [transactions, setTransactions] = useState([]);
-    const [roomId, setRoomId] = useState(null);
+    const [transactions, setTransactions] = useState<Array<any>>([]);
+    const [roomId, setRoomId] = useState<string | null>(null);
     const [remoteName, setRemoteName] = useState("Stranger");
     const { id } = useParams();
 
@@ -579,7 +595,10 @@ export const Connect = ({
           if (localVideoTrack) {
             localVideoTrack.stop(); // Stop the video track
           }
-          setLocalVideoTrack(null); // Clear the video track reference
+          // Use the callback prop instead of trying to set state directly
+          if (onVideoTrackChange) {
+              onVideoTrackChange(null);
+          }
           setIsConnected(false);
       } else {
           // Reinitialize the video track
@@ -588,7 +607,10 @@ export const Connect = ({
           })
           .then((stream) => {
             const videoTrack = stream.getVideoTracks()[0];
-            setLocalVideoTrack(videoTrack);
+            // Use the callback prop to update the parent's state
+            if (onVideoTrackChange) {
+                onVideoTrackChange(videoTrack);
+            }
             setIsConnected(true);
         
             if (localVideoRef.current) {
@@ -669,8 +691,8 @@ export const Connect = ({
     }, [socket, publicKey, roomId]);
 
     useEffect(() => {
-      const socket = io(URL);
-      socket.on('send-offer', async ({roomId}) => {
+      const socketInstance = io(URL);
+      socketInstance.on('send-offer', async ({roomId}) => {
           console.log("sending offer");
           setLobby(false);
           setRoomId(roomId);
@@ -691,7 +713,7 @@ export const Connect = ({
           pc.onicecandidate = async (e) => {
               console.log("receiving ice candidate locally");
               if (e.candidate) {
-                 socket.emit("add-ice-candidate", {
+                 socketInstance.emit("add-ice-candidate", {
                   candidate: e.candidate,
                   type: "sender",
                   roomId
@@ -703,14 +725,14 @@ export const Connect = ({
               console.log("on negotiation needed, sending offer");
               const sdp = await pc.createOffer();
               pc.setLocalDescription(sdp)
-              socket.emit("offer", {
+              socketInstance.emit("offer", {
                   sdp,
                   roomId
               })
           }
       });
 
-      socket.on("offer", async ({roomId, sdp: remoteSdp}) => {
+      socketInstance.on("offer", async ({roomId, sdp: remoteSdp}) => {
           console.log("received offer");
           setLobby(false);
           setRoomId(roomId);
@@ -726,7 +748,7 @@ export const Connect = ({
           setRemoteMediaStream(stream);
           // trickle ice 
           setReceivingPc(pc);
-          window.pcr = pc;
+          (window as any).pcr = pc;
           pc.ontrack = (e) => {
               alert("ontrack");
           }
@@ -737,7 +759,7 @@ export const Connect = ({
               }
               console.log("on ice candidate on receiving side");
               if (e.candidate) {
-                 socket.emit("add-ice-candidate", {
+                 socketInstance.emit("add-ice-candidate", {
                   candidate: e.candidate,
                   type: "receiver",
                   roomId
@@ -745,7 +767,7 @@ export const Connect = ({
               }
           }
 
-          socket.emit("answer", {
+          socketInstance.emit("answer", {
               roomId,
               sdp: sdp
           });
@@ -760,13 +782,15 @@ export const Connect = ({
                   setRemoteAudioTrack(track1)
                   setRemoteVideoTrack(track2)
               }
-              remoteVideoRef.current.srcObject.addTrack(track1)
-              remoteVideoRef.current.srcObject.addTrack(track2)
-              remoteVideoRef.current.play();
+              if (remoteVideoRef.current && remoteVideoRef.current.srcObject instanceof MediaStream) {
+                remoteVideoRef.current.srcObject.addTrack(track1)
+                remoteVideoRef.current.srcObject.addTrack(track2)
+                remoteVideoRef.current.play();
+              }
           }, 5000)
       });
 
-      socket.on("answer", ({roomId, sdp: remoteSdp}) => {
+      socketInstance.on("answer", ({roomId, sdp: remoteSdp}) => {
           setLobby(false);
           setSendingPc(pc => {
               pc?.setRemoteDescription(remoteSdp)
@@ -775,11 +799,11 @@ export const Connect = ({
           console.log("loop closed");
       });
 
-      socket.on("lobby", () => {
+      socketInstance.on("lobby", () => {
           setLobby(true);
       });
 
-      socket.on("add-ice-candidate", ({candidate, type}) => {
+      socketInstance.on("add-ice-candidate", ({candidate, type}) => {
           console.log("add ice candidate from remote");
           console.log({candidate, type})
           if (type == "sender") {
@@ -806,7 +830,7 @@ export const Connect = ({
       });
       
       // Listen for crypto transactions
-      socket.on('crypto-received', ({ amount, signature }) => {
+      socketInstance.on('crypto-received', ({ amount, signature }) => {
         setTransactions(prev => [...prev, { 
           type: 'received', 
           amount,
@@ -814,13 +838,13 @@ export const Connect = ({
         }]);
       });
 
-      setSocket(socket);
+      setSocket(socketInstance);
       
       // Cleanup function
       return () => {
-        socket.disconnect();
+        socketInstance.disconnect();
       };
-    }, [name]);
+    }, [name, localAudioTrack, localVideoTrack]);
 
     useEffect(() => {
       if (localVideoRef.current && localVideoTrack) {
@@ -988,8 +1012,8 @@ export const Connect = ({
                       </button>
                     </div>
                     <SolanaIntegration
-                      recipient={{ solanaAddress: peerWalletAddress }}
-                      onTransactionComplete={(txInfo) => {
+                      recipient={peerWalletAddress || ''}
+                      onTransactionComplete={(txInfo: TransactionInfo) => {
                         if (txInfo.status === 'success') {
                           setTransactions(prev => [...prev, { 
                             type: 'sent', 
@@ -1103,8 +1127,4 @@ export const Connect = ({
         </main>
       </div>
     )
-}
-
-
-
-
+};

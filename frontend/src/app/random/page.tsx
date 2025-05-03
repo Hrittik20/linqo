@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, Send, X, Wallet, RefreshCw, Check } from 'lucide-react';
 import { BrowserRouter } from 'react-router-dom';
 import { useRouter } from 'next/navigation';
-import { Connect, Page } from './connect';
-import { TEST } from '../test/page';
+import { Connect } from './connect';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 // export default function RandomConnect() {
@@ -414,16 +413,16 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 export default function RandomConnect() {
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const [localAudioTrack, setLocalAudioTrack] = useState(null);
-  const [localVideoTrack, setLocalVideoTrack] = useState(null);
+  const [localAudioTrack, setLocalAudioTrack] = useState<MediaStreamTrack | null>(null);
+  const [localVideoTrack, setLocalVideoTrack] = useState<MediaStreamTrack | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [loading, setLoading] = useState(true);
   const [joined, setJoined] = useState(false);
   const [username, setUsername] = useState("");
-  const videoRef = useRef(null);
-  const audioContext = useRef(null);
-  const analyser = useRef(null);
-  const animationFrame = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioContext = useRef<AudioContext | null>(null);
+  const analyser = useRef<AnalyserNode | null>(null);
+  const animationFrame = useRef<number | null>(null);
 
   const router = useRouter();
 
@@ -462,7 +461,7 @@ export default function RandomConnect() {
   };
 
   // Initialize audio analyzer to visualize microphone input
-  const initAudioAnalyser = (stream) => {
+  const initAudioAnalyser = (stream: MediaStream) => {
     if (!audioContext.current) {
       audioContext.current = new AudioContext();
       analyser.current = audioContext.current.createAnalyser();
@@ -474,7 +473,7 @@ export default function RandomConnect() {
       const dataArray = new Uint8Array(analyser.current.frequencyBinCount);
       
       const updateAudioLevel = () => {
-        analyser.current.getByteFrequencyData(dataArray);
+        analyser.current?.getByteFrequencyData(dataArray);
         const average = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
         setAudioLevel(average);
         animationFrame.current = requestAnimationFrame(updateAudioLevel);
@@ -559,7 +558,7 @@ export default function RandomConnect() {
     initializeMedia();
   };
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
