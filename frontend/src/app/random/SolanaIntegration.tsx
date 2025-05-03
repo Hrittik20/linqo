@@ -137,8 +137,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import * as web3 from '@solana/web3.js';
 
+interface SolanaIntegrationProps {
+  recipient: string; // Assuming recipient is a string (public key)
+  onTransactionComplete?: (signature: string) => void; // Optional callback function
+}
+
 // Enhanced SolanaIntegration component with improved error handling and user feedback
-export const SolanaIntegration = ({ recipient, onTransactionComplete }) => {
+export const SolanaIntegration = ({ recipient, onTransactionComplete }: SolanaIntegrationProps) => {
   const { publicKey, sendTransaction } = useWallet();
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
