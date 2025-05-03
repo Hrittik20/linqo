@@ -155,7 +155,7 @@ export const SolanaIntegration = ({ recipient, onTransactionComplete }: SolanaIn
     setWalletConnected(!!publicKey);
   }, [publicKey]);
 
-  const sendSol = async (e) => {
+  const sendSol = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!publicKey) {
