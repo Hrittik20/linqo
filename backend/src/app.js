@@ -16,7 +16,7 @@ const io = new socket_io_1.Server(server, {
 });
 const userManager = new UserManager_1.UserManager();
 
-const PORT = process.env.PORT || 3000;
+const PORT = 'https://linqo-azure.vercel.app/';
 
 const getSocketsInRoom = (roomId) => {
     const room = io.sockets.adapter.rooms.get(roomId);
