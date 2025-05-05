@@ -16,6 +16,8 @@ const io = new socket_io_1.Server(server, {
 });
 const userManager = new UserManager_1.UserManager();
 
+const PORT = process.env.PORT || 3000;
+
 const getSocketsInRoom = (roomId) => {
     const room = io.sockets.adapter.rooms.get(roomId);
     if (!room) return [];
@@ -58,6 +60,6 @@ io.on('connection', (socket) => {
         }
     });
 });
-server.listen(3000, () => {
+server.listen(PORT, () => {
     console.log('listening on *:3000');
 });
