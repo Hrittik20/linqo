@@ -548,7 +548,7 @@ interface TransactionInfo {
   error?: string;
 }
 
-const URL = "http://localhost:3000";
+const URL = "https://linqo-azure.vercel.app";
 
 interface ConnectProps {
   name: string;
