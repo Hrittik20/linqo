@@ -548,6 +548,8 @@ interface TransactionInfo {
   error?: string;
 }
 
+// const URL = "https://linqo-backend-e5jlyaech-hrittiks-projects-9bda8799.vercel.app/";
+
 const URL = "https://linqo-azure.vercel.app/";
 
 interface ConnectProps {

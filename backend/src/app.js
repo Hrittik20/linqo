@@ -16,9 +16,9 @@ const io = new socket_io_1.Server(server, {
 });
 const userManager = new UserManager_1.UserManager();
 
-const PORT = 'https://linqo-azure.vercel.app/';
+// const PORT = 'https://linqo-backend-ov2qwg49b-hrittiks-projects-9bda8799.vercel.app/';
 
-// const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 const getSocketsInRoom = (roomId) => {
     const room = io.sockets.adapter.rooms.get(roomId);
@@ -63,5 +63,5 @@ io.on('connection', (socket) => {
     });
 });
 server.listen(PORT, () => {
-    console.log('listening on *:3000');
+    console.log(`listening on port: ${PORT}`);
 });
