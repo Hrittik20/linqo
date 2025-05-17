@@ -548,9 +548,9 @@ interface TransactionInfo {
   error?: string;
 }
 
-// const URL = "https://linqo-backend-e5jlyaech-hrittiks-projects-9bda8799.vercel.app/";
+const URL = "https://linqo.onrender.com";
 
-const URL = "https://linqo-azure.vercel.app/";
+// const URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
 
 interface ConnectProps {
   name: string;
@@ -589,6 +589,10 @@ export const Connect = ({
     const [roomId, setRoomId] = useState<string | null>(null);
     const [remoteName, setRemoteName] = useState("Stranger");
     const { id } = useParams();
+
+    useEffect(() => {
+      console.log("Connecting to socket server at:", URL);
+    }, []);
 
     // Toggle video
     const toggleVideo = () => {
