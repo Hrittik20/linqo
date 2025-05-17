@@ -11,7 +11,9 @@ const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "*"
+        origin: "https://linqo-azure.vercel.app/",
+        methods: ['GET','POST'],
+        credentials: true
     }
 });
 const userManager = new UserManager_1.UserManager();
