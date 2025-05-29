@@ -11,7 +11,11 @@ const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: ["https://linqo-azure.vercel.app/", "https://linqo-hrittiks-projects-9bda8799.vercel.app/", "https://linqo-git-main-hrittiks-projects-9bda8799.vercel.app/"],
+        origin: [
+            "https://linqo-azure.vercel.app", 
+            "https://linqo-hrittiks-projects-9bda8799.vercel.app", 
+            "https://linqo-git-main-hrittiks-projects-9bda8799.vercel.app"
+        ],
         methods: ['GET','POST'],
         credentials: true
     }
