@@ -548,9 +548,7 @@ interface TransactionInfo {
   error?: string;
 }
 
-const URL = "https://linqo.onrender.com";
-
-// const URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
+const URL = process.env.NEXT_PUBLIC_URL;
 
 interface ConnectProps {
   name: string;
