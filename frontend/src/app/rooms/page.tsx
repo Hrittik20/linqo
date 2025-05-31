@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { ArrowLeft, Search, Users, Star, MessageCircle, Zap, TrendingUp, Plus } from 'lucide-react';
+import { ArrowLeft, Search, Users, Star, MessageCircle, Zap, TrendingUp, Plus, AlertTriangle } from 'lucide-react';
 
 export default function Rooms() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,8 +103,22 @@ export default function Rooms() {
       </header>
 
       <main className="pt-20 px-4 max-w-7xl mx-auto">
-        {/* Search and Create Room */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
+        {/* Construction Notice */}
+        <div className="mb-8 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-500/30 rounded-xl p-6">
+          <div className="flex items-center mb-3">
+            <AlertTriangle className="text-orange-400 mr-3" size={24} />
+            <h2 className="text-xl font-bold text-orange-300">🚧 Under Construction</h2>
+          </div>
+          <p className="text-orange-200 mb-2">
+            This page is currently under development and shows our planned features for community rooms.
+          </p>
+          <p className="text-orange-300 text-sm">
+            The rooms shown below are mockups to demonstrate the intended functionality. Check back soon for the full experience!
+          </p>
+        </div>
+
+        {/* Search and Create Room - Disabled State */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8 items-center opacity-60 pointer-events-none">
           <div className="flex-1 w-full">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -113,29 +127,30 @@ export default function Rooms() {
               <input
                 type="text"
                 className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Search rooms by name, category or description..."
+                placeholder="Search rooms by name, category or description... (Coming Soon)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                disabled
               />
             </div>
           </div>
-          <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2 hover:opacity-90 transition whitespace-nowrap">
+          <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2 hover:opacity-90 transition whitespace-nowrap" disabled>
             <Plus size={18} />
             <span>Create Room</span>
           </button>
         </div>
 
-        {/* Featured Rooms */}
+        {/* Featured Rooms - Preview */}
         {featuredRooms.length > 0 && searchTerm === '' && (
-          <div className="mb-12">
+          <div className="mb-12 opacity-75">
             <div className="flex items-center mb-6">
               <Star className="text-yellow-400 mr-2" size={20} />
-              <h2 className="text-xl font-bold">Featured Rooms</h2>
+              <h2 className="text-xl font-bold">Featured Rooms <span className="text-sm text-gray-400 font-normal">(Preview)</span></h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {featuredRooms.map(room => (
-                <Link href={`/room/${room.id}`} key={room.id}>
-                  <div className="border border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:border-blue-500 transition-all duration-300">
+                <div key={room.id} className="cursor-not-allowed">
+                  <div className="border border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 transition-all duration-300">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-xl font-bold">{room.name}</h3>
@@ -147,31 +162,31 @@ export default function Rooms() {
                       </span>
                     </div>
                     <p className="mt-4 text-gray-300">{room.description}</p>
-                    <div className="mt-4 flex items-center text-blue-400">
+                    <div className="mt-4 flex items-center text-gray-500">
                       <MessageCircle size={16} className="mr-2" />
-                      <span>Join Conversation</span>
+                      <span>Coming Soon</span>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* All/Filtered Rooms */}
-        <div>
+        {/* All/Filtered Rooms - Preview */}
+        <div className="opacity-75">
           <div className="flex items-center mb-6">
             {searchTerm ? (
               <>
                 <Search className="text-gray-400 mr-2" size={20} />
                 <h2 className="text-xl font-bold">
-                  Search Results {filteredRooms.length > 0 ? `(${filteredRooms.length})` : ''}
+                  Search Results {filteredRooms.length > 0 ? `(${filteredRooms.length})` : ''} <span className="text-sm text-gray-400 font-normal">(Preview)</span>
                 </h2>
               </>
             ) : (
               <>
                 <Zap className="text-blue-400 mr-2" size={20} />
-                <h2 className="text-xl font-bold">All Rooms</h2>
+                <h2 className="text-xl font-bold">All Rooms <span className="text-sm text-gray-400 font-normal">(Preview)</span></h2>
               </>
             )}
           </div>
@@ -182,6 +197,7 @@ export default function Rooms() {
               <button 
                 onClick={() => setSearchTerm('')}
                 className="mt-4 text-blue-400 hover:text-blue-300"
+                disabled
               >
                 Clear search
               </button>
@@ -189,8 +205,8 @@ export default function Rooms() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredRooms.map(room => (
-                <Link href={`/room/${room.id}`} key={room.id}>
-                  <div className="border border-gray-700 bg-gray-800 rounded-xl p-4 hover:border-blue-500/50 hover:bg-gray-800/80 transition-all duration-300">
+                <div key={room.id} className="cursor-not-allowed">
+                  <div className="border border-gray-700 bg-gray-800 rounded-xl p-4 transition-all duration-300">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-bold">{room.name}</h3>
@@ -202,29 +218,29 @@ export default function Rooms() {
                       </span>
                     </div>
                     <p className="mt-3 text-sm text-gray-300 line-clamp-2">{room.description}</p>
-                    <div className="mt-3 flex items-center text-sm text-blue-400">
+                    <div className="mt-3 flex items-center text-sm text-gray-500">
                       <MessageCircle size={14} className="mr-1" />
-                      <span>Join</span>
+                      <span>Coming Soon</span>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Trending Topics */}
+        {/* Trending Topics - Preview */}
         {searchTerm === '' && (
-          <div className="mt-16 mb-8">
+          <div className="mt-16 mb-8 opacity-75">
             <div className="flex items-center mb-6">
               <TrendingUp className="text-green-400 mr-2" size={20} />
-              <h2 className="text-xl font-bold">Trending Topics</h2>
+              <h2 className="text-xl font-bold">Trending Topics <span className="text-sm text-gray-400 font-normal">(Preview)</span></h2>
             </div>
             <div className="flex flex-wrap gap-2">
               {['#NFTs', '#DeFi', '#Bitcoin', '#Ethereum', '#DAOs', '#Solana', '#GameFi', '#Web3Jobs', '#Metaverse'].map(tag => (
                 <span 
                   key={tag} 
-                  className="px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 cursor-pointer text-sm"
+                  className="px-4 py-2 bg-gray-800 rounded-full text-sm cursor-not-allowed"
                 >
                   {tag}
                 </span>
