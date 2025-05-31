@@ -851,13 +851,14 @@ export const Connect = ({
     }, [name, localAudioTrack, localVideoTrack]);
 
     useEffect(() => {
-      if (localVideoRef.current && localVideoTrack) {
-        localVideoRef.current.srcObject = new MediaStream([localVideoTrack]);
-        localVideoRef.current.play().catch((error) => {
-          console.error("Error playing local video:", error);
-        });
-      }
-    }, [localVideoTrack]);
+      if (!localVideoTrack || !localVideoRef.current) return;
+
+      const stream = new MediaStream([localVideoTrack]);
+      localVideoRef.current.srcObject = stream;
+      localVideoRef.current.onloadedmetadata = () => {
+        localVideoRef.current?.play();
+      };
+    }, [localVideoTrack, localVideoRef.current]);
 
     return (
       <div className="min-h-screen bg-gray-900 text-white">
